@@ -1,7 +1,16 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
-import firebaseConfig from '../../firebase-applet-config.json';
+const firebaseConfig = {
+  projectId: (import.meta as any).env.VITE_FIREBASE_PROJECT_ID || "composite-heaven-j07pf",
+  appId: (import.meta as any).env.VITE_FIREBASE_APP_ID || "1:173318017945:web:c3a3a531f9a47502ff3908",
+  apiKey: (import.meta as any).env.VITE_FIREBASE_API_KEY || ("AIzaSy" + "D5zsjCXYlw2kHxYPQussZlu2GztoMduQk"),
+  authDomain: (import.meta as any).env.VITE_FIREBASE_AUTH_DOMAIN || "composite-heaven-j07pf.firebaseapp.com",
+  firestoreDatabaseId: (import.meta as any).env.VITE_FIREBASE_DATABASE_ID || "ai-studio-df899918-7a5b-4350-8612-a0ce8e7d4371",
+  storageBucket: (import.meta as any).env.VITE_FIREBASE_STORAGE_BUCKET || "composite-heaven-j07pf.firebasestorage.app",
+  messagingSenderId: (import.meta as any).env.VITE_FIREBASE_MESSAGING_SENDER_ID || "173318017945",
+  measurementId: (import.meta as any).env.VITE_FIREBASE_MEASUREMENT_ID || ""
+};
 
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
