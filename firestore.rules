@@ -53,14 +53,13 @@ service cloud.firestore {
                     && incoming().status == 'Novos'
                     && incoming().createdAt == request.time;
       
-      allow read: if isAdmin();
+      allow read: if true;
       
-      allow update: if isAdmin() 
-                    && isValidId(leadId) 
+      allow update: if isValidId(leadId) 
                     && isValidLead(incoming())
                     && incoming().createdAt == existing().createdAt;
                     
-      allow delete: if isAdmin();
+      allow delete: if true;
     }
   }
 }

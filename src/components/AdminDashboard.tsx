@@ -20,20 +20,26 @@ import {
   ChevronRight,
   ShieldCheck,
   Edit,
-  Save
+  Save,
+  Lock
 } from 'lucide-react';
 import { subscribeToLeads, updateLeadStatus, updateLead, deleteLead } from '../lib/services';
-import { loginWithGoogle, loginWithGoogleRedirect, logout, auth } from '../lib/firebase';
 import { type Lead, type LeadStatus } from '../types';
-import { User } from 'firebase/auth';
 
 interface AdminDashboardProps {
   onBackToLanding: () => void;
 }
 
 export default function AdminDashboard({ onBackToLanding }: AdminDashboardProps) {
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [authLoading, setAuthLoading] = useState(true);
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('festaimpossivel_admin_auth') === 'true';
+    } catch {
+      return false;
+    }
+  });
+  const [passwordInput, setPasswordInput] = useState('');
+  const [loginError, setLoginError] = useState('');
   const [leads, setLeads] = useState<Lead[]>([]);
   const [leadsLoading, setLeadsLoading] = useState(false);
   const [leadsError, setLeadsError] = useState('');
@@ -89,18 +95,9 @@ export default function AdminDashboard({ onBackToLanding }: AdminDashboardProps)
     setEditedLead(prev => prev ? { ...prev, [key]: value } : null);
   };
 
-  // Sync auth state
+  // Fetch leads when authenticated
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      setCurrentUser(user);
-      setAuthLoading(false);
-    });
-    return unsubscribe;
-  }, []);
-
-  // Fetch leads when authenticated and correct email
-  useEffect(() => {
-    if (!currentUser || (currentUser.email !== 'contatojuniorla@gmail.com' && currentUser.email !== 'CanalPapeldeTrouxa@gmail.com')) {
+    if (!isAdminAuthenticated) {
       return;
     }
 
@@ -119,41 +116,36 @@ export default function AdminDashboard({ onBackToLanding }: AdminDashboardProps)
     );
 
     return unsubscribe;
-  }, [currentUser]);
+  }, [isAdminAuthenticated]);
 
-  // Handle Login Google
-  const handleLogin = async (useRedirect = false) => {
-    try {
-      setAuthLoading(true);
-      if (useRedirect) {
-        await loginWithGoogleRedirect();
-      } else {
-        await loginWithGoogle();
+  // Handle password submission
+  const handlePasswordLogin = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    setLoginError('');
+    
+    // We check VITE_ADMIN_PASSWORD from env or default to 'festa2026'
+    const correctPassword = (import.meta as any).env.VITE_ADMIN_PASSWORD || 'festa2026';
+    
+    if (passwordInput.trim() === correctPassword) {
+      try {
+        localStorage.setItem('festaimpossivel_admin_auth', 'true');
+      } catch (err) {
+        console.warn('LocalStorage indisponível:', err);
       }
-    } catch (err: any) {
-      console.error('Falha no login:', err);
-      // If popup is blocked/failed, auto-try redirect
-      if (!useRedirect && err?.code !== 'auth/popup-closed-by-user') {
-        try {
-          console.warn('Popup bloqueado ou falhou. Testando redirecionamento...');
-          await loginWithGoogleRedirect();
-        } catch (redirectErr) {
-          console.error('Falha no fallback de redirecionamento:', redirectErr);
-        }
-      }
-    } finally {
-      setAuthLoading(false);
+      setIsAdminAuthenticated(true);
+      setLoginError('');
+    } else {
+      setLoginError('Senha incorreta! Digite a senha administrativa correta.');
     }
   };
 
   // Handle Logout
-  const handleLogout = async () => {
+  const handleLogout = () => {
     try {
-      await logout();
-      setSelectedLead(null);
-    } catch (err) {
-      console.error('Falha no logout:', err);
-    }
+      localStorage.removeItem('festaimpossivel_admin_auth');
+    } catch {}
+    setIsAdminAuthenticated(false);
+    setSelectedLead(null);
   };
 
   // Update status directly from table dropdown or detail view
@@ -360,18 +352,8 @@ export default function AdminDashboard({ onBackToLanding }: AdminDashboardProps)
 
   const filteredLeads = getFilteredLeads();
 
-  // STAGE 1: AUTH LOADING
-  if (authLoading) {
-    return (
-      <div className="min-h-screen bg-[#FAF9FC] flex flex-col justify-center items-center py-10 px-4">
-        <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-[#6d06dc]"></div>
-        <p className="mt-4 text-xs font-mono text-slate-500">Verificando credenciais de segurança...</p>
-      </div>
-    );
-  }
-
-  // STAGE 2: NOT LOGGED IN Screen (Google Auth Call)
-  if (!currentUser) {
+  // STAGE 1: NOT LOGGED IN Screen (Password authentication)
+  if (!isAdminAuthenticated) {
     return (
       <div className="min-h-screen bg-[#F2F1F5] flex flex-col justify-center items-center py-12 px-4 relative">
         <div className="absolute top-4 left-4">
@@ -385,106 +367,47 @@ export default function AdminDashboard({ onBackToLanding }: AdminDashboardProps)
 
         <div className="max-w-md w-full bg-white rounded-3xl p-8 shadow-2xl border border-slate-200 text-center space-y-6">
           <div className="relative mx-auto w-16 h-16 rounded-2xl bg-[#6d06dc]/10 flex items-center justify-center text-[#6d06dc]">
-            <ShieldCheck className="w-8 h-8 text-[#6d06dc]" />
-            <span className="absolute -top-1 -right-1 bg-[#eab308] w-4 h-4 rounded-full flex items-center justify-center border-2 border-white">
-              <span className="block w-1.5 h-1.5 rounded-full bg-slate-900"></span>
-            </span>
+            <Lock className="w-8 h-8 text-[#6d06dc]" />
           </div>
 
-          <div className="space-y-2">
-            <h2 className="text-xl font-extrabold text-slate-900">Acesso Restrito ao Painel</h2>
-            <p className="text-slate-500 text-xs leading-relaxed">
-              Área de administração privada reservada exclusivamente para o gerenciamento de curadoria do projeto do Ju.
-            </p>
+          <div className="space-y-1">
+            <h2 className="text-2xl font-black text-[#111827] tracking-wider uppercase font-mono">login</h2>
+            <p className="text-slate-400 text-xs font-mono">Digitar senha privada</p>
           </div>
 
-          <div className="p-4 bg-amber-50 rounded-2xl border border-amber-200/50 flex gap-3 text-left">
-            <Info className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
-            <div className="text-xs text-amber-800 space-y-1">
-              <p className="font-bold">E-mails autorizados para consulta:</p>
-              <p>• contatojuniorla@gmail.com</p>
-              <p>• CanalPapeldeTrouxa@gmail.com</p>
+          <form onSubmit={handlePasswordLogin} className="space-y-4 text-left">
+            <div>
+              <label className="block text-slate-500 text-[10px] font-bold mb-1.5 uppercase font-mono tracking-widest text-[#6d06dc]">Senha Secreta</label>
+              <input
+                type="password"
+                required
+                value={passwordInput}
+                onChange={(e) => setPasswordInput(e.target.value)}
+                placeholder="••••••••••••"
+                className="w-full bg-[#FAF9FC] border border-slate-200 rounded-2xl px-4 py-3.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#6d06dc]/40 transition-all text-center tracking-widest font-mono text-slate-800"
+                autoFocus
+              />
             </div>
-          </div>
 
-          <div className="space-y-3 pt-2">
-            <button
-              onClick={() => handleLogin(false)}
-              className="w-full flex items-center justify-center gap-3 bg-[#6d06dc] hover:bg-[#5804b3] text-white font-extrabold py-3.5 px-6 rounded-2xl shadow-[0_4px_12px_rgba(109,6,220,0.25)] transition-all cursor-pointer text-sm"
-            >
-              {/* Google Vector Icon */}
-              <svg className="w-4 h-4 text-white fill-current" viewBox="0 0 24 24">
-                <path d="M12.24 10.285V13.4h6.887C18.2 15.614 15.645 18 12.24 18c-3.86 0-7-3.14-7-7s3.14-7 7-7c1.71 0 3.284.614 4.51 1.636l2.427-2.427C17.433 1.773 14.975 1 12.24 1 6.584 1 2 5.584 2 11.24s4.584 10.24 10.24 10.24c5.795 0 10.24-4.068 10.24-10.24 0-.568-.068-1.222-.185-1.755H12.24z"/>
-              </svg>
-              <span>Entrar com o Google (Popup)</span>
-            </button>
+            {loginError && (
+              <p className="text-rose-600 text-[11px] font-bold bg-rose-50 border border-rose-100 p-3 rounded-xl text-center">
+                {loginError}
+              </p>
+            )}
 
             <button
-              onClick={() => handleLogin(true)}
-              className="w-full flex items-center justify-center gap-3 bg-white hover:bg-slate-50 text-slate-755 font-bold py-3.5 px-6 rounded-2xl border border-slate-200 shadow-sm transition-all cursor-pointer text-sm"
+              type="submit"
+              className="w-full bg-[#6d06dc] hover:bg-[#5804b3] text-white font-extrabold py-3.5 px-6 rounded-2xl shadow-[0_4px_12px_rgba(109,6,220,0.25)] transition-all cursor-pointer text-sm font-mono uppercase tracking-wider text-center"
             >
-              <svg className="w-4 h-4 text-slate-500 fill-current" viewBox="0 0 24 24">
-                <path d="M12.24 10.285V13.4h6.887C18.2 15.614 15.645 18 12.24 18c-3.86 0-7-3.14-7-7s3.14-7 7-7c1.71 0 3.284.614 4.51 1.636l2.427-2.427C17.433 1.773 14.975 1 12.24 1 6.584 1 2 5.584 2 11.24s4.584 10.24 10.24 10.24c5.795 0 10.24-4.068 10.24-10.24 0-.568-.068-1.222-.185-1.755H12.24z"/>
-              </svg>
-              <span>Entrar via Redirecionamento ⚡</span>
+              Entrar no Painel
             </button>
-            <p className="text-[10px] text-slate-400">
-              * Redirecionamento é o método mais recomendado para celulares, Safari e domínios personalizados.
-            </p>
-          </div>
-
-          <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 text-left text-[10px] text-slate-500 leading-relaxed space-y-2">
-            <p className="font-bold text-slate-700 flex items-center gap-1.5">
-              <span>⚠️ Atenção ao usar Domínio Personalizado:</span>
-            </p>
-            <p>
-              Ao utilizar o seu próprio domínio (<strong>festaimpossivel.acasadoju.club</strong>), você deve liberar este endereço no painel do Google e do Firebase. Do contrário, o Google encerra a sessão imediatamente para sua segurança.
-            </p>
-            <ol className="list-decimal pl-4 space-y-1">
-              <li>Acesse o <strong>Console do Firebase</strong> &gt; Autenticação &gt; Configurações &gt; Domínios Autorizados e adicione <code>festaimpossivel.acasadoju.club</code> (e <code>acasadoju.club</code>).</li>
-              <li>Acesse o <strong>Google Cloud Console</strong> &gt; APIs e Serviços &gt; Credenciais &gt; Escolha seu ID de cliente OAuth e adicione <code>https://festaimpossivel.acasadoju.club</code> em "Origens JavaScript autorizadas".</li>
-            </ol>
-          </div>
-        </div>
-      </div>
-    );
-  }
-  // STAGE 3: LOGGED IN BUT EMAIL DENIED
-  if (currentUser && currentUser.email !== 'contatojuniorla@gmail.com' && currentUser.email !== 'CanalPapeldeTrouxa@gmail.com') {
-    return (
-      <div className="min-h-screen bg-[#F2F1F5] flex flex-col justify-center items-center py-12 px-4">
-        <div className="max-w-md w-full bg-white rounded-3xl p-8 shadow-2xl border border-rose-100 text-center space-y-6">
-          <div className="mx-auto w-16 h-16 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center">
-            <AlertTriangle className="w-8 h-8" />
-          </div>
-
-          <div className="space-y-2">
-            <h2 className="text-xl font-black text-rose-800">Acesso Negado</h2>
-            <p className="text-slate-500 text-xs leading-relaxed">
-              O seu e-mail do Google (<strong>{currentUser.email}</strong>) não possui permissão para acessar este painel administrativo.
-            </p>
-          </div>
-
-          <div className="flex gap-4">
-            <button
-              onClick={handleLogout}
-              className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3.5 px-4 rounded-xl text-sm transition-colors cursor-pointer"
-            >
-              Alternar de Conta
-            </button>
-            <button
-              onClick={onBackToLanding}
-              className="flex-1 bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 font-bold py-3.5 px-4 rounded-xl text-sm transition-colors cursor-pointer"
-            >
-              Voltar à Landing
-            </button>
-          </div>
+          </form>
         </div>
       </div>
     );
   }
 
-  // STAGE 4: AUTHORIZED ADMIN DASHBOARD
+  // STAGE 2: AUTHORIZED ADMIN DASHBOARD
   return (
     <div className="min-h-screen bg-[#FAF9FD] text-[#1e1b24] font-sans pb-16">
       
@@ -499,7 +422,7 @@ export default function AdminDashboard({ onBackToLanding }: AdminDashboardProps)
               <span>Painel do Ju</span>
               <span className="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-1.5 py-0.5 rounded uppercase font-mono">ON-LINE</span>
             </h1>
-            <p className="text-[10px] text-slate-400 font-mono leading-none mt-0.5">{currentUser.email}</p>
+            <p className="text-[10px] text-slate-400 font-mono leading-none mt-0.5">Administrador Autenticado</p>
           </div>
         </div>
 
