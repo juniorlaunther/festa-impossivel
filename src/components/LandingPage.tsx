@@ -316,7 +316,7 @@ export default function LandingPage({ onAdminClick }: LandingPageProps) {
                 Os Bastidores Cenográficos
               </span>
               <h2 className="text-3xl font-black leading-none text-white uppercase tracking-tight">
-                A Alma do <br className="hidden md:inline" /> Reality Show
+                A festa como <br className="hidden md:inline" /> você nunca viu
               </h2>
               <p className="text-xs text-purple-300/60 font-mono uppercase tracking-widest">
                 "Não fazemos apenas festas, materializamos sonhos extraordinários."
@@ -326,10 +326,10 @@ export default function LandingPage({ onAdminClick }: LandingPageProps) {
             {/* Right Main Copy Blocks */}
             <div className="md:col-span-8 space-y-6 md:border-l md:border-purple-950/40 md:pl-10 text-neutral-300 text-base md:text-lg leading-relaxed text-justify md:text-left">
               <p className="font-medium text-white/95">
-                O <strong className="text-white hover:text-[#eab308] border-b border-[#eab308]/40 transition bg-gradient-to-r from-yellow-300/10 to-yellow-300/0 px-1">Festa Impossível</strong> é um aclamado reality criado e apresentado pelo Ju, onde ele mostra o processo real de transformar festas comuns em experiências visuais extraordinárias mesmo superando prazos apertados, orçamento limitado, desafios cenográficos complexos e muita coisa para resolver de última hora.
+                A <strong className="text-white hover:text-[#eab308] border-b border-[#eab308]/40 transition bg-gradient-to-r from-yellow-300/10 to-yellow-300/0 px-1">Festa Impossível</strong> é um reality de transformação criado e apresentado pelo Junior Launther, do @ACasaDoJu, onde festas comuns ganham uma produção visual surpreendente. A proposta é mostrar os bastidores reais da criação de uma festa: planejamento, desafios, orçamento, improvisos, decoração, montagem e o resultado final.
               </p>
               <p className="text-purple-100/90 text-sm md:text-base border-t border-purple-950/20 pt-4 leading-relaxed">
-                Seu evento não precisa ser comum. Inscreva a sua ideia de celebração para se tornar o tema da próxima temporada do reality e tenha o Ju liderando todo o design, improvisos geniais e transformação estética diante dos holofotes para criar um marco histórico na sua vida!
+                Seu evento não precisa ser comum. Inscreva a sua ideia de celebração para se tornar o tema da próxima temporada do reality e tenha o Ju liderando toda a decoração da sua festa.
               </p>
             </div>
           </div>
@@ -347,14 +347,14 @@ export default function LandingPage({ onAdminClick }: LandingPageProps) {
             <div className="w-full lg:w-5/12 space-y-5">
               <div className="inline-flex items-center gap-2 bg-[#eab308] text-slate-950 font-black text-xs px-4 py-1.5 rounded-full uppercase tracking-widest">
                 <Compass className="w-3.5 h-3.5 animate-spin-slow text-slate-950" />
-                <span>Como Funciona a Audição</span>
+                <span>Como Funciona a Seleção</span>
               </div>
               <h2 className="text-3xl sm:text-4xl font-black text-white leading-tight uppercase">
-                Seleção de Projetos <br />
-                para a Temporada
+                SELEÇÃO DA FESTA <br />
+                DA PRÓXIMA TEMPORADA
               </h2>
               <p className="text-purple-100/80 text-sm sm:text-base leading-relaxed">
-                Esta página é uma <strong>porta de entrada exclusiva</strong> onde o Ju analisa seu plano pessoalmente. Ele seleciona celebrações autênticas, com histórias marcantes e desafios cenográficos que deem excelentes episódios!
+                Esta página é uma porta de entrada para pessoas que desejam contratar o Ju para transformar sua celebração em uma Festa Impossível. Analisamos eventos com histórias reais, ideias marcantes e potencial visual para se tornarem uma experiência inesquecível, dentro do orçamento informado por cada pessoa.
               </p>
             </div>
  
@@ -400,8 +400,8 @@ export default function LandingPage({ onAdminClick }: LandingPageProps) {
                     <Palette className="w-5 h-5 text-[#eab308]" />
                   </div>
                   <div className="relative z-10">
-                    <h4 className="font-extrabold text-sm text-white">Expressão Artística</h4>
-                    <p className="text-xs text-purple-200/80 leading-normal mt-1">Sua personalidade contada através de peças audaciosas e um visual original do zero.</p>
+                    <h4 className="font-extrabold text-sm text-white">Projeto com personalidade</h4>
+                    <p className="text-xs text-purple-200/80 leading-normal mt-1">Buscamos festas com uma história, um desejo ou uma ideia que possa ser transformada em uma decoração autoral e impactante.</p>
                   </div>
                 </motion.div>
 
@@ -443,8 +443,8 @@ export default function LandingPage({ onAdminClick }: LandingPageProps) {
                     <Layers className="w-5 h-5 text-[#eab308]" />
                   </div>
                   <div className="relative z-10">
-                    <h4 className="font-extrabold text-sm text-white">Acompanhamento Real</h4>
-                    <p className="text-xs text-purple-200/80 leading-normal mt-1">Direção de arte integrada, controle orçamentário transparente e soluções engenhosas.</p>
+                    <h4 className="font-extrabold text-sm text-white">Orçamento sob medida</h4>
+                    <p className="text-xs text-purple-200/80 leading-normal mt-1">A proposta é criada de acordo com o tipo de evento, prazo, local, estrutura desejada e valor disponível para a decoração.</p>
                   </div>
                 </motion.div>
 
@@ -486,8 +486,8 @@ export default function LandingPage({ onAdminClick }: LandingPageProps) {
                     <Sparkles className="w-5 h-5 text-[#eab308]" />
                   </div>
                   <div className="relative z-10 font-sans">
-                    <h4 className="font-extrabold text-sm text-white">Mágica de TV</h4>
-                    <p className="text-xs text-purple-200/80 leading-normal mt-1">Vivencie os bastidores reais completos, da montagem frenética ao espetáculo final com o Ju.</p>
+                    <h4 className="font-extrabold text-sm text-white">Bastidores reais</h4>
+                    <p className="text-xs text-purple-200/80 leading-normal mt-1">Quando o projeto também tem potencial para o reality, o processo pode ser gravado e transformado em conteúdo para o Instagram @ACasaDoJu.</p>
                   </div>
                 </motion.div>
               </div>
@@ -508,7 +508,7 @@ export default function LandingPage({ onAdminClick }: LandingPageProps) {
                 <span>SERVIÇO PREMIUM CONTRATADO</span>
               </p>
               <p className="text-xs sm:text-xs text-purple-100/90 max-w-4xl">
-                O <strong>Festa Impossível</strong> é um serviço premium de assessoria cenográfica e direção de arte <strong>100% contratado e pago</strong>. O envio do formulário funciona como uma seleção/triagem artística para admissão de projetos na agenda exclusiva do designer Ju.
+                O <strong>Festa Impossível</strong> é um serviço premium de assessoria e decoração de festas <strong>100% contratado e pago</strong>. O envio do formulário funciona como um pré-cadastro para análise do evento, orçamento e disponibilidade da nossa equipe sob a possibilidade de execução da sua festa.
               </p>
             </div>
             <div className="w-full lg:w-auto shrink-0 border-t lg:border-t-0 lg:border-l border-yellow-500/20 pt-3 lg:pt-0 lg:pl-6">

@@ -296,11 +296,11 @@ export default function AdminDashboard({ onBackToLanding }: AdminDashboardProps)
         // Custom budget sort based on BUDGET_OPTIONS options
         if (sortField === 'budget') {
           const orders = [
-            "R$ 2 mil a R$ 5 mil",
-            "R$ 5 mil a R$ 10 mil",
-            "R$ 10 mil a R$ 20 mil",
+            "R$ 2 mil à R$ 5 mil",
+            "R$ 6 mil à R$ 10 mil",
+            "R$ 11 mil à R$ 20 mil",
             "Acima de R$ 20 mil",
-            "Ainda não sei"
+            "Acima de R$ 50 mil"
           ];
           const idxA = orders.indexOf(String(valA));
           const idxB = orders.indexOf(String(valB));
