@@ -23,7 +23,7 @@ import {
   Save
 } from 'lucide-react';
 import { subscribeToLeads, updateLeadStatus, updateLead, deleteLead } from '../lib/services';
-import { loginWithGoogle, logout, auth } from '../lib/firebase';
+import { loginWithGoogle, loginWithGoogleRedirect, logout, auth } from '../lib/firebase';
 import { type Lead, type LeadStatus } from '../types';
 import { User } from 'firebase/auth';
 
@@ -122,12 +122,25 @@ export default function AdminDashboard({ onBackToLanding }: AdminDashboardProps)
   }, [currentUser]);
 
   // Handle Login Google
-  const handleLogin = async () => {
+  const handleLogin = async (useRedirect = false) => {
     try {
       setAuthLoading(true);
-      await loginWithGoogle();
-    } catch (err) {
+      if (useRedirect) {
+        await loginWithGoogleRedirect();
+      } else {
+        await loginWithGoogle();
+      }
+    } catch (err: any) {
       console.error('Falha no login:', err);
+      // If popup is blocked/failed, auto-try redirect
+      if (!useRedirect && err?.code !== 'auth/popup-closed-by-user') {
+        try {
+          console.warn('Popup bloqueado ou falhou. Testando redirecionamento...');
+          await loginWithGoogleRedirect();
+        } catch (redirectErr) {
+          console.error('Falha no fallback de redirecionamento:', redirectErr);
+        }
+      }
     } finally {
       setAuthLoading(false);
     }
@@ -391,27 +404,51 @@ export default function AdminDashboard({ onBackToLanding }: AdminDashboardProps)
               <p className="font-bold">E-mails autorizados para consulta:</p>
               <p>• contatojuniorla@gmail.com</p>
               <p>• CanalPapeldeTrouxa@gmail.com</p>
-              <p className="mt-1.5 pt-1.5 border-t border-amber-200/50 text-[10px] text-amber-750">
-                💡 <strong>Dica de teste:</strong> Se o popup de login do Google for bloqueado dentro do iframe, clique no botão de <strong>Abrir o aplicativo em nova guia</strong> no topo direito da tela.
-              </p>
             </div>
           </div>
 
-          <button
-            onClick={handleLogin}
-            className="w-full flex items-center justify-center gap-3 bg-[#6d06dc] hover:bg-[#5804b3] text-white font-extrabold py-4 px-6 rounded-2xl shadow-[0_5px_15px_rgba(109,6,220,0.3)] transition-all cursor-pointer"
-          >
-            {/* Google Vector Icon */}
-            <svg className="w-5 h-5 text-white fill-current" viewBox="0 0 24 24">
-              <path d="M12.24 10.285V13.4h6.887C18.2 15.614 15.645 18 12.24 18c-3.86 0-7-3.14-7-7s3.14-7 7-7c1.71 0 3.284.614 4.51 1.636l2.427-2.427C17.433 1.773 14.975 1 12.24 1 6.584 1 2 5.584 2 11.24s4.584 10.24 10.24 10.24c5.795 0 10.24-4.068 10.24-10.24 0-.568-.068-1.222-.185-1.755H12.24z"/>
-            </svg>
-            <span>Logar com Google</span>
-          </button>
+          <div className="space-y-3 pt-2">
+            <button
+              onClick={() => handleLogin(false)}
+              className="w-full flex items-center justify-center gap-3 bg-[#6d06dc] hover:bg-[#5804b3] text-white font-extrabold py-3.5 px-6 rounded-2xl shadow-[0_4px_12px_rgba(109,6,220,0.25)] transition-all cursor-pointer text-sm"
+            >
+              {/* Google Vector Icon */}
+              <svg className="w-4 h-4 text-white fill-current" viewBox="0 0 24 24">
+                <path d="M12.24 10.285V13.4h6.887C18.2 15.614 15.645 18 12.24 18c-3.86 0-7-3.14-7-7s3.14-7 7-7c1.71 0 3.284.614 4.51 1.636l2.427-2.427C17.433 1.773 14.975 1 12.24 1 6.584 1 2 5.584 2 11.24s4.584 10.24 10.24 10.24c5.795 0 10.24-4.068 10.24-10.24 0-.568-.068-1.222-.185-1.755H12.24z"/>
+              </svg>
+              <span>Entrar com o Google (Popup)</span>
+            </button>
+
+            <button
+              onClick={() => handleLogin(true)}
+              className="w-full flex items-center justify-center gap-3 bg-white hover:bg-slate-50 text-slate-755 font-bold py-3.5 px-6 rounded-2xl border border-slate-200 shadow-sm transition-all cursor-pointer text-sm"
+            >
+              <svg className="w-4 h-4 text-slate-500 fill-current" viewBox="0 0 24 24">
+                <path d="M12.24 10.285V13.4h6.887C18.2 15.614 15.645 18 12.24 18c-3.86 0-7-3.14-7-7s3.14-7 7-7c1.71 0 3.284.614 4.51 1.636l2.427-2.427C17.433 1.773 14.975 1 12.24 1 6.584 1 2 5.584 2 11.24s4.584 10.24 10.24 10.24c5.795 0 10.24-4.068 10.24-10.24 0-.568-.068-1.222-.185-1.755H12.24z"/>
+              </svg>
+              <span>Entrar via Redirecionamento ⚡</span>
+            </button>
+            <p className="text-[10px] text-slate-400">
+              * Redirecionamento é o método mais recomendado para celulares, Safari e domínios personalizados.
+            </p>
+          </div>
+
+          <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 text-left text-[10px] text-slate-500 leading-relaxed space-y-2">
+            <p className="font-bold text-slate-700 flex items-center gap-1.5">
+              <span>⚠️ Atenção ao usar Domínio Personalizado:</span>
+            </p>
+            <p>
+              Ao utilizar o seu próprio domínio (<strong>festaimpossivel.acasadoju.club</strong>), você deve liberar este endereço no painel do Google e do Firebase. Do contrário, o Google encerra a sessão imediatamente para sua segurança.
+            </p>
+            <ol className="list-decimal pl-4 space-y-1">
+              <li>Acesse o <strong>Console do Firebase</strong> &gt; Autenticação &gt; Configurações &gt; Domínios Autorizados e adicione <code>festaimpossivel.acasadoju.club</code> (e <code>acasadoju.club</code>).</li>
+              <li>Acesse o <strong>Google Cloud Console</strong> &gt; APIs e Serviços &gt; Credenciais &gt; Escolha seu ID de cliente OAuth e adicione <code>https://festaimpossivel.acasadoju.club</code> em "Origens JavaScript autorizadas".</li>
+            </ol>
+          </div>
         </div>
       </div>
     );
   }
-
   // STAGE 3: LOGGED IN BUT EMAIL DENIED
   if (currentUser && currentUser.email !== 'contatojuniorla@gmail.com' && currentUser.email !== 'CanalPapeldeTrouxa@gmail.com') {
     return (

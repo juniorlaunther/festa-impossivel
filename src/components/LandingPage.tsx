@@ -500,6 +500,24 @@ export default function LandingPage({ onAdminClick }: LandingPageProps) {
             </div>
           </div>
 
+          {/* STRIKING PAID SERVICE CONFIRMATION - HORIZONTAL BAND AT FOOTER OF SECTION */}
+          <div className="mt-8 sm:mt-10 p-5 sm:p-6 bg-yellow-500/10 border-l-4 border-[#eab308] rounded-r-2xl text-purple-100/90 text-xs sm:text-sm leading-relaxed shadow-md flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+            <div className="space-y-2">
+              <p className="font-bold text-[#eab308] uppercase tracking-wider flex items-center gap-2 text-xs sm:text-xs">
+                <Info className="w-4 h-4 shrink-0" />
+                <span>SERVIÇO PREMIUM CONTRATADO</span>
+              </p>
+              <p className="text-xs sm:text-xs text-purple-100/90 max-w-4xl">
+                O <strong>Festa Impossível</strong> é um serviço premium de assessoria cenográfica e direção de arte <strong>100% contratado e pago</strong>. O envio do formulário funciona como uma seleção/triagem artística para admissão de projetos na agenda exclusiva do designer Ju.
+              </p>
+            </div>
+            <div className="w-full lg:w-auto shrink-0 border-t lg:border-t-0 lg:border-l border-yellow-500/20 pt-3 lg:pt-0 lg:pl-6">
+              <p className="text-[#eab308] font-mono text-[10px] sm:text-xs uppercase tracking-wider font-semibold">
+                ★ Não se trata de sorteio, brinde ou transformação gratuita.
+              </p>
+            </div>
+          </div>
+
         </div>
       </section>
 

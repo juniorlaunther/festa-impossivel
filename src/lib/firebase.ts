@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, signOut } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 const firebaseConfig = {
   projectId: (import.meta as any).env.VITE_FIREBASE_PROJECT_ID || "composite-heaven-j07pf",
@@ -71,6 +71,16 @@ export async function loginWithGoogle() {
     return result.user;
   } catch (error) {
     console.error('Efetuar login falhou:', error);
+    throw error;
+  }
+}
+
+// Helper to authenticate with Google via Redirect (ideal for iOS / Safari and Custom Domains)
+export async function loginWithGoogleRedirect() {
+  try {
+    await signInWithRedirect(auth, googleProvider);
+  } catch (error) {
+    console.error('Efetuar login por redirecionamento falhou:', error);
     throw error;
   }
 }
