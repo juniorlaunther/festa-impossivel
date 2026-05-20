@@ -1,0 +1,49 @@
+{
+  "entities": {
+    "Lead": {
+      "title": "Lead",
+      "description": "Formulários de captação de clientes interessados na decoração do Ju",
+      "type": "object",
+      "properties": {
+        "fullName": { "type": "string", "description": "Nome completo do interessado" },
+        "phone": { "type": "string", "description": "Telefone/WhatsApp para contato" },
+        "email": { "type": "string", "format": "email", "description": "E-mail para contato" },
+        "city": { "type": "string", "description": "Cidade do evento" },
+        "eventDate": { "type": "string", "description": "Data prevista do evento" },
+        "eventType": { "type": "string", "description": "Tipo de evento" },
+        "guestCount": { "type": "string", "description": "Quantidade aproximada de convidados" },
+        "budget": { "type": "string", "description": "Orçamento aproximado para decoração" },
+        "description": { "type": "string", "description": "Mensagem livre sobre o evento dos sonhos" },
+        "hasLocation": { "type": "string", "description": "Se já possui local definido" },
+        "style": { "type": "string", "description": "Estilo que combina mais com a festa" },
+        "referredBy": { "type": "string", "description": "Como conheceu o trabalho do Ju" },
+        "whatsappConsent": { "type": "boolean", "description": "Permissão para entrar em contato via WhatsApp" },
+        "status": { "type": "string", "enum": ["Novos", "Em análise", "Interessantes", "Sem perfil", "Respondidos"], "description": "Status de atendimento do lead" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Data e hora de envio" }
+      },
+      "required": [
+        "fullName",
+        "phone",
+        "email",
+        "city",
+        "eventDate",
+        "eventType",
+        "guestCount",
+        "budget",
+        "description",
+        "hasLocation",
+        "style",
+        "referredBy",
+        "whatsappConsent",
+        "status",
+        "createdAt"
+      ]
+    }
+  },
+  "firestore": {
+    "leads/{leadId}": {
+      "schema": "Lead",
+      "description": "Coleção de leads de pré-atendimento enviados pelos usuários"
+    }
+  }
+}
