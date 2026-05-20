@@ -10,7 +10,16 @@ type ActiveView = 'landing' | 'admin';
 export default function App() {
   const getInitialView = (): ActiveView => {
     const path = window.location.pathname;
-    if (path === '/login' || path === '/admin') {
+    const hash = window.location.hash;
+    
+    if (
+      path === '/login' || 
+      path === '/admin' || 
+      hash === '#/login' || 
+      hash === '#/admin' || 
+      hash === '#login' || 
+      hash === '#admin'
+    ) {
       return 'admin';
     }
     return 'landing';
@@ -37,29 +46,50 @@ export default function App() {
     testConnection();
   }, []);
 
-  // Sync state with back/forward button
+  // Sync state with back/forward button and hash changes
   useEffect(() => {
-    const handlePopState = () => {
+    const handleUrlChange = () => {
       const path = window.location.pathname;
-      if (path === '/login' || path === '/admin') {
+      const hash = window.location.hash;
+      
+      if (
+        path === '/login' || 
+        path === '/admin' || 
+        hash === '#/login' || 
+        hash === '#/admin' || 
+        hash === '#login' || 
+        hash === '#admin'
+      ) {
         setView('admin');
       } else {
         setView('landing');
       }
     };
 
-    window.addEventListener('popstate', handlePopState);
+    window.addEventListener('popstate', handleUrlChange);
+    window.addEventListener('hashchange', handleUrlChange);
     return () => {
-      window.removeEventListener('popstate', handlePopState);
+      window.removeEventListener('popstate', handleUrlChange);
+      window.removeEventListener('hashchange', handleUrlChange);
     };
   }, []);
 
   const navigateTo = (newView: ActiveView) => {
     setView(newView);
     if (newView === 'admin') {
-      window.history.pushState({}, '', '/login');
+      try {
+        window.history.pushState({}, '', '/login');
+      } catch (e) {
+        // Fallback for strict browser environments
+      }
+      window.location.hash = '/login';
     } else {
-      window.history.pushState({}, '', '/');
+      try {
+        window.history.pushState({}, '', '/');
+      } catch (e) {
+        // Fallback for strict browser environments
+      }
+      window.location.hash = '';
     }
   };
 
